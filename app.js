@@ -58,45 +58,42 @@ app.use((error, req, res, next) => {
 const apiUrl2 = "/api/v2";
 
 // Account
-app.use(`${apiUrl2}/account`, require("./api/v2/routers/account"));
+app.use(`${apiUrl2}/account`, require("./routers/AccountRouter"));
 
 // Role
-app.use(`${apiUrl2}/role`, require("./api/v2/routers/role"));
+app.use(`${apiUrl2}/role`, require("./routers/RoleRouter"));
 
 // Tag
-app.use(`${apiUrl2}/tag`, require("./api/v2/routers/tag"));
+app.use(`${apiUrl2}/tag`, require("./routers/TagRouter"));
 
 // Post
-app.use(`${apiUrl2}/post`, require("./api/v2/routers/post"));
+app.use(`${apiUrl2}/post`, require("./routers/PostRouter"));
 
 // Vote
-app.use(`${apiUrl2}/vote`, require("./api/v2/routers/vote"));
+app.use(`${apiUrl2}/vote`, require("./routers/VoteRouter"));
 
 // Bookmark
-app.use(`${apiUrl2}/bookmark`, require("./api/v2/routers/bookmark"));
+app.use(`${apiUrl2}/bookmark`, require("./routers/BookmarkRouter"));
 
 // Follow Tag
-app.use(`${apiUrl2}/follow_tag`, require("./api/v2/routers/follow_tag"));
+app.use(`${apiUrl2}/follow_tag`, require("./routers/Follow_TagRouter"));
 
 // Follow Account
-app.use(
-  `${apiUrl2}/follow_account`,
-  require("./api/v2/routers/follow_account")
-);
+app.use(`${apiUrl2}/follow_account`, require("./routers/Follow_AccountRouter"));
 
 // Comment
-app.use(`${apiUrl2}/post`, require("./api/v2/routers/comment"));
+app.use(`${apiUrl2}/post`, require("./routers/CommentRouter"));
 
 // update image
-app.use(`${apiUrl2}/image`, require("./api/v2/routers/image"));
+app.use(`${apiUrl2}/image`, require("./routers/CommentRouter"));
 
 // notification
-app.use(`${apiUrl2}/notification`, require("./api/v2/routers/notification"));
+app.use(`${apiUrl2}/notification`, require("./routers/NotificationRouter"));
 
 // information
-app.use(`${apiUrl2}/information`, require("./api/v2/routers/information"));
+app.use(`${apiUrl2}/information`, require("./routers/InformationRouter"));
 
 //feedback
-app.use(`${apiUrl2}/feedback`, require("./api/v2/routers/feedback"));
+app.use(`${apiUrl2}/feedback`, require("./routers/FeedbackRouter"));
 
 module.exports = app;

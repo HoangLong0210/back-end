@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 
-const Auth = require("../../../auth");
-const Post = require("../module/post");
-const Vote = require("../module/vote");
+const Auth = require("../auth");
+const Post = require("../modules/PostModule");
+const Vote = require("../modules/VoteModule");
 
 /**
  * Thêm vote bài viết

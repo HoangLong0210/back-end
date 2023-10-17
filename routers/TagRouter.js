@@ -5,7 +5,7 @@ var Auth = require("../auth");
 var MyDrive = require("../drive");
 var Tag = require("../modules/TagModule");
 var Post = require("../modules/PostModule");
-var Account = require("../module/account");
+var Account = require("../modules/AccountModule");
 
 /**
  * Lấy tất cả thẻ
