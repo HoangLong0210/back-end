@@ -1,0 +1,15 @@
+module.exports = {
+  account: {},
+  bookmark: {},
+  comment: {},
+  feedback: {},
+  follow_account: {},
+  follow_tag: {},
+  image: {},
+  information: {},
+  notification: {},
+  post: {},
+  role: {},
+  tag: {},
+  vote: {},
+};

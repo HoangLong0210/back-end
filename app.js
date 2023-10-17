@@ -6,8 +6,6 @@ const app = express();
 const dotenv = require("dotenv");
 const db = require("./database");
 
-// const drive = require('./drive');
-
 // Swagger UI
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
@@ -57,11 +55,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-// ----- My API V2
 const apiUrl2 = "/api/v2";
-
-// Upload file
-// app.use('/img', require('./api/v0/routers/file'));
 
 // Account
 app.use(`${apiUrl2}/account`, require("./api/v2/routers/account"));
