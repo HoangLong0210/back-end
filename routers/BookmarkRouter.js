@@ -4,14 +4,15 @@ const router = express.Router();
 const Auth = require("../auth");
 const Post = require("../modules/PostModule");
 const Bookmark = require("../modules/BookmarkModule");
+const message = require("../common/Message");
 
 /**
  * Bookmark bài viết
  * @params      id_post
  * @permission  Đăng nhập mới được bookmark
- * @return      200: Lưu bài viết thành công
- *              400: Bài viết đã được bookmark trước đó
- *              404: Bài viết không tồn tại
+ * @return      200: BOOKMARK_SUCCESSFULL
+ *              400: BOOKMARKED
+ *              404: BOOKMARK_NOT_EXISTED
  */
 router.post("/:id_post", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -23,17 +24,17 @@ router.post("/:id_post", Auth.authenGTUser, async (req, res, next) => {
       let bookmarkExists = await Bookmark.has(id_account, id_post);
       if (bookmarkExists) {
         res.status(400).json({
-          message: "Bạn đã bookmark bài viết này rồi",
+          message: message.bookmark.BOOKMARKED,
         });
       } else {
         await Bookmark.add(id_account, id_post);
         res.status(200).json({
-          message: "Bookmark bài viết thành công",
+          message: message.bookmark.BOOKMARK_SUCCESSFULL,
         });
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.bookmark.BOOKMARK_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -46,9 +47,9 @@ router.post("/:id_post", Auth.authenGTUser, async (req, res, next) => {
  * Xóa bookmark
  * @params      id_post
  * @permission  Đăng nhập mới được xóa bookmark
- * @return      200: Xóa bookmark bài viết thành công
- *              400: Bài viết chưa được bookmark nên k thể xóa bookmark
- *              404: Bài viết không tồn tại
+ * @return      200: DELETE_BOOKMARK_SUCCESSFULL
+ *              400: DELETE_BOOKMARK_FAIL
+ *              404: BOOKMARK_NOT_EXISTED
  */
 router.delete("/:id_post", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -62,16 +63,16 @@ router.delete("/:id_post", Auth.authenGTUser, async (req, res, next) => {
         await Bookmark.delete(id_account, id_post);
 
         res.status(200).json({
-          message: "Xóa bookmark thành công",
+          message: message.bookmark.DELETE_BOOKMARK_SUCCESSFULL,
         });
       } else {
         res.status(400).json({
-          message: "Bạn chưa bookmark bài viết này nên không thể xóa bookmark",
+          message: message.bookmark.DELETE_BOOKMARK_FAIL,
         });
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.bookmark.BOOKMARK_NOT_EXISTED,
       });
     }
   } catch (error) {

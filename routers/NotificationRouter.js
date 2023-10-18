@@ -1,17 +1,16 @@
 const express = require("express");
 const router = express.Router();
-var Auth = require("../auth");
-var Account = require("../modules/AccountModule");
-var Notification = require("../modules/NotificationModule");
+const Auth = require("../auth");
+const Account = require("../modules/AccountModule");
+const Notification = require("../modules/NotificationModule");
+const message = require("../common/Message");
 
 /**
  * Xóa thông báo
  * @permisson   Người được nhận thông báo đó
- *
- * @return      200: Đổi ảnh thành công
- *              400: Lỗi tải file
- *              401: Tải khoản không có quyền
- *              404: Thông báo không tồn tại
+ * @return      200: ACTION_SUCCESSFULL
+ *              401: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              404: NOTIFICATION_NOT_EXISTED
  */
 router.delete(
   "/:id_notification",
@@ -23,7 +22,7 @@ router.delete(
 
       if (!exist) {
         return res.status(404).json({
-          message: "Thông báo không tồn tại",
+          message: message.notification.NOTIFICATION_NOT_EXISTED,
         });
       }
 
@@ -31,14 +30,14 @@ router.delete(
 
       if (id_account != Auth.tokenData(req).id_account) {
         return res.status(401).json({
-          message: "Bạn không có quyền xóa thông báo này",
+          message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
           id1: id_account,
           id2: Auth.tokenData(req).id_account,
         });
       } else {
         let deleted = await Notification.deleteNotification(id_notificatioin);
         return res.status(200).json({
-          message: "Xóa thông báo thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       }
     } catch (err) {
@@ -50,15 +49,14 @@ router.delete(
 /**
  * Lấy số lượng thông báo chưa đọc
  * @permisson   Đăng nhập
- *
- * @return      200: Lấy thành công
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/count", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let count = await Notification.countUnreadNotification(id_account);
     return res.status(200).json({
-      message: "Lấy số lượng thông báo chưa đọc",
+      message: message.common.GET_SUCCESSFULL,
       data: count,
     });
   } catch (err) {
@@ -69,15 +67,14 @@ router.get("/count", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Lấy thông báo CHƯA ĐỌC theo trang
  * @permisson   Tải khoản được tạo
- *
- * @return      200: Lấy thành công
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/all", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let data = await Notification.listNotification(id_account);
     return res.status(200).json({
-      message: "List thông báo chưa đọc thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (err) {
@@ -88,15 +85,14 @@ router.get("/all", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Lấy tất cả thông báo (cả chưa đọc và đọc rồi)
  * @permisson   Tải khoản được tạo
- *
- * @return      200: Lấy thành công
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/list", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let data = await Notification.listAllNotification(id_account);
     return res.status(200).json({
-      message: "List thông báo thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (err) {
@@ -107,15 +103,14 @@ router.get("/list", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Đánh dấu đã đọc tất cả thông báo của user
  * @permisson   Đăng nhập
- *
- * @return      200: thành công
+ * @return      200: ACTION_SUCCESSFULL
  */
 router.get("/read_all", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let data = await Notification.readAllNotification(id_account);
     return res.status(200).json({
-      message: "Đánh dấu đọc tất cả thông báo thành công",
+      message: message.common.ACTION_SUCCESSFULL,
       data: data,
     });
   } catch (err) {
@@ -126,15 +121,14 @@ router.get("/read_all", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Xóa tất cả thông báo của user
  * @permisson   Đăng nhập
- *
- * @return      200: thành công
+ * @return      200: GET_SUCCESSFULL
  */
 router.delete("/delete_all", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let data = await Notification.deleteAllNotification(id_account);
     return res.status(200).json({
-      message: "Xóa tất cả thông báo thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (err) {
@@ -145,9 +139,8 @@ router.delete("/delete_all", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Vô thông báo để xác nhận đã xem
  * @permisson   Tài khoản đã tạo
- *
- * @return      200: Vô thành công, trả về link để vô trang cần đến
- *              404: Thông báo không tồn tại
+ * @return      200: ACTION_SUCCESSFULL
+ *              404: NOTIFICATION_NOT_EXISTED
  */
 router.get("/:id_notification", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -156,12 +149,12 @@ router.get("/:id_notification", Auth.authenGTUser, async (req, res, next) => {
 
     if (!exist) {
       return res.status(404).json({
-        message: "Thông báo không tồn tại",
+        message: message.notification.NOTIFICATION_NOT_EXISTED,
       });
     } else {
       let data = await Notification.selectID(id_notificatioin);
       return res.status(200).json({
-        message: "Lấy thông báo thành công",
+        message: message.common.ACTION_SUCCESSFULL,
         data: data,
       });
     }
@@ -174,9 +167,9 @@ router.get("/:id_notification", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Vô thông báo để xác nhận đã xem
  * @permisson   Tài khoản đã tạo
- *
- * @return      200: Vô thành công, trả về link để vô trang cần đến
- *              404: Thông báo không tồn tại
+ * @return      200: ACTION_SUCCESSFULL
+ *              403: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              404: NOTIFICATION_NOT_EXISTED
  */
 router.get(
   "/:id_notification/read",
@@ -189,19 +182,19 @@ router.get(
 
       if (!exist) {
         return res.status(404).json({
-          message: "Thông báo không tồn tại",
+          message: message.notification.NOTIFICATION_NOT_EXISTED,
         });
       } else {
         let notification = await Notification.selectID(id_notification);
         if (notification.id_account !== id_account) {
           return res.status(403).json({
-            message: "Bạn không có quyền đọc thông báo của người khác!",
+            message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
           });
         }
 
         await Notification.readNotification(id_notification);
         return res.status(200).json({
-          message: "Đọc thông báo thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       }
     } catch (err) {

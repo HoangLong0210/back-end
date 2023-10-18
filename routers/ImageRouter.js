@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router();
 const fs = require("fs");
 const multer = require("multer");
-var Auth = require("../auth");
-var Account = require("../modules/AccountModule");
-var Image = require("../modules/ImageModule");
+const Auth = require("../auth");
+const Account = require("../modules/AccountModule");
+const Image = require("../modules/ImageModule");
+const message = require("../common/Message");
 
 const storage = multer.diskStorage({
   destination: "./uploads",
@@ -31,7 +32,7 @@ var upload = multer({
  * @permisson   Những người có tài khoản
  *              Những tài khoản admin, mor được xem tất cả hình
  *              Không dùng cho tài khoản bị khóa
- * @return      200: Lấy ảnh thành công, trả về các id
+ * @return      200: ACTION_SUCCESSFULL
  *              401: Tài khoản không có quyền xem của người khác
  *              402: Sai đinh dạng page number
  *              403: Tài khoản đã bị khóa
@@ -45,7 +46,7 @@ router.get("/account", Auth.authenGTUser, async (req, res, next) => {
     let amount = await Image.amountImageInAccount(id_account);
 
     return res.status(200).json({
-      message: "Thao tác thành công",
+      message: message.common.ACTION_SUCCESSFULL,
       data: data,
       amount: amount,
     });
@@ -61,7 +62,7 @@ router.get("/account", Auth.authenGTUser, async (req, res, next) => {
  *
  * @return      200: Trả về hình
  *              400: Đọc file bị lỗi
- *              404: Không thấy hình cần
+ *              404: IMAGE_NOT_EXSITED
  */
 router.get("/:id_image", async (req, res, next) => {
   try {
@@ -70,14 +71,14 @@ router.get("/:id_image", async (req, res, next) => {
 
     if (!has) {
       return res.status(404).json({
-        message: "Hình này không tồn tại",
+        message: message.image.IMAGE_NOT_EXSITED,
       });
     } else {
       let path = await Image.selectUrl(id_image);
       let image = fs.readFile(path, (err, data) => {
         if (err) {
           res.status(400).json({
-            message: "không thể đọc file",
+            message: message.image.NOT_READ_FILE,
           });
         } else {
           res.status(200);
@@ -95,10 +96,10 @@ router.get("/:id_image", async (req, res, next) => {
  * Xóa hình theo id_image
  * @permisson   Những người có tài khoản đăng hình đấy hoặc admin hoặc mor
  *              Không dùng cho tài khoản bị khóa
- * @return      200: Xóa thành công
- *              401: Tài khoản không có quyền thực hiện
- *              403: Tài khoản đã bị khóa
- *              404: Không thấy hình
+ * @return      200: ACTION_SUCCESSFULL
+ *              401: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              403: ERROR_ACCOUNT_BANNED
+ *              404: IMAGE_NOT_EXSITED
  */
 router.delete("/:id_image", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -107,7 +108,7 @@ router.delete("/:id_image", Auth.authenGTUser, async (req, res, next) => {
 
     if (!has) {
       return res.status(404).json({
-        message: "Hình này không tồn tại",
+        message: message.image.IMAGE_NOT_EXSITED,
       });
     }
 
@@ -117,7 +118,7 @@ router.delete("/:id_image", Auth.authenGTUser, async (req, res, next) => {
 
     if (acc.account_status != 0) {
       return res.status(403).json({
-        message: "Tài khoản này đang bị khóa",
+        message: message.account.ERROR_ACCOUNT_BANNED,
       });
     }
 
@@ -129,11 +130,11 @@ router.delete("/:id_image", Auth.authenGTUser, async (req, res, next) => {
       fs.unlinkSync(path);
       let del = await Image.deleteImage(id_image);
       return res.status(200).json({
-        message: "Xóa thành công",
+        message: message.common.ACTION_SUCCESSFULL,
       });
     } else {
       return res.status(401).json({
-        message: "Tài khoản không có quyền thực hiện",
+        message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
       });
     }
   } catch (error) {
@@ -146,10 +147,10 @@ router.delete("/:id_image", Auth.authenGTUser, async (req, res, next) => {
  * Xóa hình theo id_image
  * @permisson   Những người có tài khoản đăng hình đấy hoặc admin hoặc mor
  *              Không dùng cho tài khoản bị khóa
- * @return      200: Xóa thành công
- *              401: Tài khoản không có quyền thực hiện
- *              403: Tài khoản đã bị khóa
- *              404: Không thấy hình
+ * @return      200: ACTION_SUCCESSFULL
+ *              401: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              403: ERROR_ACCOUNT_BANNED
+ *              404: IMAGE_NOT_EXSITED
  */
 router.delete("/:id_image/db", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -158,7 +159,7 @@ router.delete("/:id_image/db", Auth.authenGTUser, async (req, res, next) => {
 
     if (!has) {
       return res.status(404).json({
-        message: "Hình này không tồn tại",
+        message: message.image.IMAGE_NOT_EXSITED,
       });
     }
 
@@ -168,7 +169,7 @@ router.delete("/:id_image/db", Auth.authenGTUser, async (req, res, next) => {
 
     if (acc.account_status != 0) {
       return res.status(403).json({
-        message: "Tài khoản này đang bị khóa",
+        message: message.account.ERROR_ACCOUNT_BANNED,
       });
     }
 
@@ -176,11 +177,11 @@ router.delete("/:id_image/db", Auth.authenGTUser, async (req, res, next) => {
       // fs.unlinkSync(path);
       let del = await Image.deleteImage(id_image);
       return res.status(200).json({
-        message: "Xóa thành công",
+        message: message.common.ACTION_SUCCESSFULL,
       });
     } else {
       return res.status(401).json({
-        message: "Tài khoản không có quyền thực hiện",
+        message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
       });
     }
   } catch (error) {
@@ -194,9 +195,9 @@ router.delete("/:id_image/db", Auth.authenGTUser, async (req, res, next) => {
  * @body        file hình
  * @permisson   Những người có tài khoản
  *              Không dùng cho tài khoản bị khóa
- * @return      200: Đăng ảnh thành công, trả về id ảnh đã đăng
- *              400: Không nhận được file
- *              403: Tài khoản đã bị khóa
+ * @return      200: ACTION_SUCCESSFULL
+ *              400: NOT_RECEIVE_FILE
+ *              403: ERROR_ACCOUNT_BANNED
  */
 router.post(
   "/",
@@ -210,18 +211,18 @@ router.post(
       if (acc.account_status != 0) {
         fs.unlinkSync(file.path);
         return res.status(403).json({
-          message: "Tài khoản này đang bị khóa",
+          message: message.account.ERROR_ACCOUNT_BANNED,
         });
       }
 
       if (!file) {
         return res.status(400).json({
-          message: "Không nhận được file",
+          message: message.image.NOT_RECEIVE_FILE,
         });
       } else {
         let save = await Image.addImage(acc.id_account, file.path);
         return res.status(200).json({
-          message: "tải tệp thành công",
+          message: message.common.ACTION_SUCCESSFULL,
           data: save,
         });
       }
@@ -237,11 +238,11 @@ router.post(
  * @body        file ảnh
  * @permisson   Những người đăng ảnh đó
  *              Không dùng cho tài khoản bị khóa
- * @return      200: Đổi ảnh thành công
- *              400: Lỗi tải file
- *              401: Tải khoản không có quyền
- *              403: Tài khoản đã bị khóa
- *              404: Không thấy hình cần đổi
+ * @return      200: ACTION_SUCCESSFULL
+ *              400: ACTION_FAILED
+ *              401: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              403: ERROR_ACCOUNT_BANNED
+ *              404: IMAGE_NOT_EXSITED
  */
 router.patch(
   "/change/:id_image",
@@ -254,7 +255,7 @@ router.patch(
       let has = await Image.has(id_image);
       if (!has) {
         return res.status(404).json({
-          message: "Hình này không tồn tại",
+          message: message.image.IMAGE_NOT_EXSITED,
         });
       }
 
@@ -263,13 +264,13 @@ router.patch(
 
       if (acc.account_status != 0) {
         return res.status(403).json({
-          message: "Tài khoản này đang bị khóa",
+          message: message.account.ERROR_ACCOUNT_BANNED,
         });
       }
 
       if (!file) {
         return res.status(400).json({
-          message: "Tải file không thành công",
+          message: message.common.ACTION_FAILED,
         });
       }
 
@@ -283,12 +284,12 @@ router.patch(
         let change = await Image.changeImage(id_image, file.path);
         let img = await Image.selectID(id_image);
         return res.status(200).json({
-          message: "Thay đổi thành công",
+          message: message.common.ACTION_SUCCESSFULL,
           data: img,
         });
       } else {
         return res.status(401).json({
-          message: "Tài khoản không có quyền thực hiện",
+          message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
         });
       }
     } catch (err) {

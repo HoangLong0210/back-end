@@ -1,29 +1,27 @@
 const express = require("express");
 const router = express.Router();
-var Auth = require("../auth");
+const Auth = require("../auth");
 const Role = require("../modules/RoleModule");
+const message = require("../common/Message");
 
 /**
  * Danh sách chức vụ
  * @params      i
- *
  * @body
- *
- * @permisson   Moder trở lên
- *
- * @return      200: thao tác thành công
+ * @permisson   moder, admin
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/", Auth.authenGTModer, async (req, res, next) => {
   try {
     let result = await Role.selectAll();
     res.status(200).json({
-      message: "Lấy danh sách chức vụ thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: result,
     });
   } catch (e) {
     console.log(e);
     res.status(500).json({
-      message: "Something wrong!",
+      message: message.common.ERROR_OTHER,
     });
   }
 });
@@ -31,12 +29,10 @@ router.get("/", Auth.authenGTModer, async (req, res, next) => {
 /**
  * Tìm chức vụ
  * @params
- *
  * @body
- *
- * @permisson   Chỉ moder trở lên
- *
- * @return      200: Thao tác thành công
+ * @permisson   moder, admin
+ * @return      200: ACTION_SUCCESSFULL
+ *              404: NOT_FOUND
  */
 router.get("/:id", Auth.authenGTModer, async (req, res, next) => {
   try {
@@ -47,18 +43,18 @@ router.get("/:id", Auth.authenGTModer, async (req, res, next) => {
     if (exists) {
       let result = await Role.selectId(req.params.id);
       res.status(200).json({
-        message: "Tìm thấy chức vụ",
+        message: message.common.ACTION_SUCCESSFULL,
         data: result,
       });
     } else {
       res.status(404).json({
-        message: "Không tìm thấy chức vụ này",
+        message: message.common.NOT_FOUND,
       });
     }
   } catch (e) {
     console.log(e);
     res.status(500).json({
-      message: "Something wrong!",
+      message: message.common.ERROR_OTHER,
     });
   }
 });

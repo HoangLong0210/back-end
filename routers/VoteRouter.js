@@ -4,15 +4,16 @@ const router = express.Router();
 const Auth = require("../auth");
 const Post = require("../modules/PostModule");
 const Vote = require("../modules/VoteModule");
+const message = require("../common/Message");
 
 /**
  * Thêm vote bài viết
  * @params      id_post, type
  * @permisson   Đăng nhập mới được vote
- * @return      201: Vote thành công
- *              200: Thay đổi loại vote thành công
- *              400: Bài viết đã được vote trước đó hoặc loại vote k hợp lệ
- *              404: Bài viết không tồn tại
+ * @return      201: ADD_VOTE_SUCCESSFULL
+ *              200: CHANGE_VOTE_SUCCESSFULL
+ *              400: VOTE_INVALID/ERROR_DATA
+ *              404: POST_NOT_EXISTED
  */
 router.post("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -24,12 +25,12 @@ router.post("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
 
       if (!postExists) {
         return res.status(404).json({
-          message: "Bài viết không tồn tại",
+          message: message.post.POST_NOT_EXISTED,
         });
       }
       if (type < 0 || type > 1) {
         return res.status(400).json({
-          message: "Loại vote không hợp lệ",
+          message: message.vote.VOTE_INVALID,
         });
       }
 
@@ -37,17 +38,17 @@ router.post("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
       if (voteExists) {
         await Vote.update(id_account, id_post, type);
         return res.status(200).json({
-          message: "Thay đổi loại vote thành công",
+          message: message.vote.CHANGE_VOTE_SUCCESSFULL,
         });
       }
 
       await Vote.add(id_account, { id_post, type });
       res.status(201).json({
-        message: "Thêm vote thành công",
+        message: message.vote.ADD_VOTE_SUCCESSFULL,
       });
     } else {
       res.status(400).json({
-        message: "Thiếu dữ liệu",
+        message: message.common.ERROR_DATA,
       });
     }
   } catch (error) {
@@ -60,8 +61,8 @@ router.post("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
  * Lấy loại vote của bản thân theo bài viết
  *
  * @permisson   Đăng nhập mới được thực thi
- * @return      200: Thành công, trả về loại vote
- *              404: Bài viết chưa được vote hoặc k tồn tại
+ * @return      200: ACTION_SUCCESSFULL
+ *              404: NOT_VOTED/POST_NOT_EXISTED
  */
 router.get("/:id_post", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -75,17 +76,17 @@ router.get("/:id_post", Auth.authenGTUser, async (req, res, next) => {
 
       if (voteType.status) {
         res.status(200).json({
-          message: "Lấy loại vote thành công",
+          message: message.common.ACTION_SUCCESSFULL,
           data: voteType.vote,
         });
       } else {
         res.status(404).json({
-          message: "Bạn chưa vote bài viết này",
+          message: message.vote.NOT_VOTED,
         });
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -98,8 +99,8 @@ router.get("/:id_post", Auth.authenGTUser, async (req, res, next) => {
  * Xóa vote
  *
  * @permission  Đăng nhập mới được thực thi
- * @return      200: Xóa thành công
- *              404: Bài viết không tồn tại hoặc chưa được vote trước đó
+ * @return      200: ACTION_SUCCESSFULL
+ *              404: NOT_VOTED/POST_NOT_EXISTED
  */
 router.delete("/:id_post", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -114,16 +115,16 @@ router.delete("/:id_post", Auth.authenGTUser, async (req, res, next) => {
       if (voteType.status) {
         await Vote.delete(id_account, id_post);
         res.status(200).json({
-          message: "Xóa vote thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       } else {
         res.status(404).json({
-          message: "Bạn chưa vote bài viết này nên không thẻ xóa vote",
+          message: message.vote.NOT_VOTED,
         });
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -136,9 +137,9 @@ router.delete("/:id_post", Auth.authenGTUser, async (req, res, next) => {
  * Thay đổi loại vote
  * @params       id_post, type
  * @permission  Đăng nhập mới được thực thi
- * @return      200: Sửa thành công
- *              500: Loại vote k hợp lệ
- *              404: Bài viết k tồn tại hoặc chưa được vote trước đó
+ * @return      200: ACTION_SUCCESSFULL
+ *              400: VOTE_INVALID
+ *              404: NOT_VOTED/POST_NOT_EXISTED
  */
 router.put("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -147,7 +148,7 @@ router.put("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
 
     if (type < 0 || type > 1) {
       return res.status(400).json({
-        message: "Loại vote không hợp lệ",
+        message: message.vote.VOTE_INVALID,
       });
     }
 
@@ -159,16 +160,16 @@ router.put("/:id_post/:type", Auth.authenGTUser, async (req, res, next) => {
       if (voteType.status) {
         await Vote.update(id_account, id_post, type);
         res.status(200).json({
-          message: "Sửa vote thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       } else {
         res.status(404).json({
-          message: "Bạn chưa vote bài viết này nên không thể sửa vote",
+          message: message.vote.NOT_VOTED,
         });
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {

@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-var Auth = require("../auth");
-var MyDrive = require("../drive");
-var Tag = require("../modules/TagModule");
-var Post = require("../modules/PostModule");
-var Account = require("../modules/AccountModule");
+const Auth = require("../auth");
+const MyDrive = require("../drive");
+const Tag = require("../modules/TagModule");
+const Post = require("../modules/PostModule");
+const Account = require("../modules/AccountModule");
+const message = require("../common/Message");
 
 /**
  * Lấy tất cả thẻ
- *
  * @permisson   Theo token
- * @return      200: Thành công, trả về danh sách các thẻ
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/all", async (req, res, next) => {
   try {
@@ -33,7 +33,7 @@ router.get("/all", async (req, res, next) => {
     else result = await Tag.selectAll();
 
     res.status(200).json({
-      message: "Lấy danh sách thẻ thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: result,
     });
   } catch (error) {
@@ -46,14 +46,15 @@ router.get("/all", async (req, res, next) => {
  * Tìm kiếm thẻ theo từ khóa
  * @query       k
  * @permission  Theo token
- * @return      200: Trả về danh sách
+ * @return      200: ACTION_SUCCESSFULL
+ *              400: NOT_KEYWORD_SEARCH
  */
 router.get("/search", async (req, res, next) => {
   try {
     let { k } = req.query;
     if (!k || k.trim().length == 0) {
       return res.status(400).json({
-        message: "Chưa có từ khóa tìm kiếm",
+        message: message.tag.NOT_KEYWORD_SEARCH,
       });
     }
 
@@ -92,7 +93,7 @@ router.get("/search", async (req, res, next) => {
       }
     }
     return res.status(200).json({
-      message: "Tìm kiếm danh sách thẻ thành công",
+      message: message.common.ACTION_SUCCESSFULL,
       data: list,
     });
     // }
@@ -106,8 +107,8 @@ router.get("/search", async (req, res, next) => {
  * Lấy 1 thẻ theo id
  *
  * @permission  Theo token
- * @return      200: Thành công, trả về thẻ cần lấy
- *              404: Không tìm thấy thể
+ * @return      200: GET_SUCCESSFULL
+ *              404: NOT_FOUND
  */
 router.get("/:id", async (req, res, next) => {
   try {
@@ -131,12 +132,12 @@ router.get("/:id", async (req, res, next) => {
       else result = await Tag.selectId(req.params.id);
 
       res.status(200).json({
-        message: "Lấy tag thành công",
+        message: message.common.GET_SUCCESSFULL,
         data: result,
       });
     } else {
       res.status(404).json({
-        message: "Không tìm thấy tag",
+        message: message.common.NOT_FOUND,
       });
     }
   } catch (error) {
@@ -149,21 +150,21 @@ router.get("/:id", async (req, res, next) => {
  * Thêm mới 1 thẻ
  * @body        name, logo
  * @permisson   Chỉ Moder trở lên mới được thêm thẻ mới
- * @return      201: Thêm thành công, trả về thẻ vừa được thêm
- *              400: Thiếu dữ liệu (tên thẻ)
+ * @return      201: ACTION_SUCCESSFULL
+ *              400: NOT_LOGO/TAG_EXISTED/UPLOAD_FAIL/NOT_NAME_TAG
  */
 router.post("/", Auth.authenGTModer, async (req, res, next) => {
   try {
     if (!req.files) {
       return res.status(400).json({
-        message: "Không có logo được tải lên",
+        message: message.tag.NOT_LOGO,
       });
     }
 
     let logo = req.files.logo;
     if (!logo) {
       return res.status(400).json({
-        message: "Không có logo được tải lên",
+        message: message.tag.NOT_LOGO,
       });
     }
 
@@ -173,27 +174,27 @@ router.post("/", Auth.authenGTModer, async (req, res, next) => {
       let tagNameExists = await Tag.hasName(name);
       if (tagNameExists) {
         return res.status(400).json({
-          message: "Tên tag đã bị trùng",
+          message: message.tag.TAG_EXISTED,
         });
       }
 
       let idLogo = await MyDrive.uploadImage(logo, name);
       if (!idLogo) {
         return res.status(400).json({
-          message: "Lỗi upload logo",
+          message: message.tag.UPLOAD_FAIL,
         });
       } else {
         let logoPath = "https://drive.google.com/uc?export=view&id=" + idLogo;
         let result = await Tag.add(name, logoPath);
 
         res.status(201).json({
-          message: "Tạo mới thẻ thành công",
+          message: message.common.ACTION_SUCCESSFULL,
           data: result,
         });
       }
     } else {
       res.status(400).json({
-        message: "Thiếu tên thẻ",
+        message: message.tag.NOT_NAME_TAG,
       });
     }
   } catch (error) {
@@ -207,9 +208,9 @@ router.post("/", Auth.authenGTModer, async (req, res, next) => {
  * @params      id
  * @body        name, logo
  * @permisson   Chỉ Moder trở lên mới được thực thi
- * @return      200: Cập nhật thành công, trả về thẻ sau khi thay đổi
- *              400: Thiếu dữ liệu
- *              404: Không tìm thấy thẻ để sửa
+ * @return      200: UPDATE_SUCCESSFULL
+ *              400: TAG_EXISTED/TAG_VALIDATION
+ *              404: TAG_NOT_EXISTED
  */
 router.put("/:id", Auth.authenGTModer, async (req, res, next) => {
   try {
@@ -225,7 +226,7 @@ router.put("/:id", Auth.authenGTModer, async (req, res, next) => {
           let tagNameExists = await Tag.hasName(name);
           if (tagNameExists) {
             return res.status(400).json({
-              message: "Tên tag đã bị trùng",
+              message: message.tag.TAG_EXISTED,
             });
           }
         }
@@ -245,17 +246,17 @@ router.put("/:id", Auth.authenGTModer, async (req, res, next) => {
         let result = await Tag.update(id, name, logoPath);
 
         res.status(200).json({
-          message: "Cập nhật thẻ thành công",
+          message: message.common.UPDATE_SUCCESSFULL,
           data: result,
         });
       } else {
         res.status(400).json({
-          message: "Tên tag không được bỏ trống",
+          message: message.tag.TAG_VALIDATION,
         });
       }
     } else {
       res.status(404).json({
-        message: "Không tìm thấy tag để sửa",
+        message: message.tag.TAG_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -268,9 +269,9 @@ router.put("/:id", Auth.authenGTModer, async (req, res, next) => {
  * Xóa thẻ theo id
  * @params      id
  * @permisson   Admin
- * @return      200: Xóa thành công
- *              403: Thẻ đã có bài viết nên không thể xóa
- *              404: Không tìm thấy thẻ để sửa
+ * @return      200: ACTION_SUCCESSFULL
+ *              403: DELETE_FAIL
+ *              404: TAG_NOT_EXISTED
  */
 router.delete("/:id", Auth.authenAdmin, async (req, res, next) => {
   try {
@@ -281,7 +282,7 @@ router.delete("/:id", Auth.authenAdmin, async (req, res, next) => {
       let countPostsOfTag = await Tag.countPostsOfTag(id);
       if (countPostsOfTag > 0) {
         return res.status(403).json({
-          message: "Thẻ đã có bài viết nên không thể xóa",
+          message: message.tag.DELETE_FAIL,
         });
       } else {
         let tag = await Tag.selectId(id);
@@ -290,12 +291,12 @@ router.delete("/:id", Auth.authenAdmin, async (req, res, next) => {
 
         let deleteTag = await Tag.delete(id);
         return res.status(200).json({
-          message: "Xóa thẻ thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       }
     } else {
       return res.status(404).json({
-        message: "Không tìm thấy tag để xóa",
+        message: message.tag.TAG_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -309,8 +310,8 @@ router.delete("/:id", Auth.authenAdmin, async (req, res, next) => {
  * @params      id tag
  * @query       page
  * @permission  Ai cũng có thể thực thi
- * @return      200: thành công, trả về danh sách
- *              404: Thẻ không tồn tại
+ * @return      200: GET_SUCCESSFULL
+ *              404: TAG_NOT_EXISTED
  */
 router.get("/:id/posts", async (req, res, next) => {
   try {
@@ -341,12 +342,12 @@ router.get("/:id/posts", async (req, res, next) => {
       }
 
       res.status(200).json({
-        message: `Lấy danh sách bài viết thành công`,
+        message: message.common.GET_SUCCESSFULL,
         data: data,
       });
     } else {
       res.status(404).json({
-        message: "Thẻ không tồn tại",
+        message: message.tag.TAG_NOT_EXISTED,
       });
     }
   } catch (error) {

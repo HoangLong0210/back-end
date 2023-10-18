@@ -21,7 +21,7 @@ const Information = require("../modules/InformationModule");
 const MyDrive = require("../drive");
 const message = require("../common/Message");
 
-var Auth = require("../auth");
+const Auth = require("../auth");
 const { selectIdStatus } = require("../modules/AccountModule");
 const storage = multer.diskStorage({
   destination: "./uploads",
@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
   },
 });
 
-var upload = multer({
+const upload = multer({
   storage: storage,
 });
 
@@ -359,14 +359,59 @@ router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
  * @return      200: REGISTER_SUCCESSFULL
  *              400: ERROR_ACCOUNT_EXISTED
  *              401: ERROR_EMAIL_EXISTED
- *              402: ERROR_REGISTER_VALIDATION
+ *              402: ERROR_REGISTER_VALIDATION/ERROR_ACCOUNT_NAME_VALIDATION/ERROR_EMAIL_VALIDATION
+ *              403: ERROR_EMAIL_INVALID_FORMAT
  *              500: ERROR_OTHER
  */
 router.post("/", async (req, res, next) => {
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/;
   try {
     var { account_name, real_name, email, password } = req.body;
 
     if (account_name && real_name && email && password) {
+      if (account_name.length > 50) {
+        return res.status(402).json({
+          message: message.account.ERROR_ACCOUNT_NAME_VALIDATION,
+        });
+      }
+
+      if (real_name.length > 50) {
+        return res.status(402).json({
+          message: message.account.ERROR_REAL_NAME_VALIDATION,
+        });
+      }
+
+      if (email.length > 50) {
+        return res.status(402).json({
+          message: message.account.ERROR_EMAIL_VALIDATION,
+        });
+      }
+
+      if (!emailRegex.test(email)) {
+        return res.status(403).json({
+          message: message.account.ERROR_EMAIL_INVALID_FORMAT,
+        });
+      }
+
+      if (password.length < 8) {
+        return res.status(402).json({
+          message: message.account.ERROR_PASSWORD_MIN,
+        });
+      }
+
+      if (password.length > 32) {
+        return res.status(402).json({
+          message: message.account.ERROR_PASSWORD_MAX,
+        });
+      }
+
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({
+          message: message.account.ERROR_PASSWORD_FORMAT,
+        });
+      }
+
       let id_role = 3;
       bcrypt.hash(password, saltRounds, async (err, hash) => {
         password = hash;

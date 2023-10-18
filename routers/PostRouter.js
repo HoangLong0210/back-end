@@ -2,20 +2,21 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 
-var Auth = require("../auth");
-var Post = require("../modules/PostModule");
-var Tag = require("../modules/TagModule");
-var Account = require("../modules/AccountModule");
-var Vote = require("../modules/VoteModule");
-var Notification = require("../modules/NotificationModule");
-var FollowAccount = require("../modules/Follow_AccountModule");
-var Bookmark = require("../modules/BookmarkModule");
+const Auth = require("../auth");
+const Post = require("../modules/PostModule");
+const Tag = require("../modules/TagModule");
+const Account = require("../modules/AccountModule");
+const Vote = require("../modules/VoteModule");
+const Notification = require("../modules/NotificationModule");
+const FollowAccount = require("../modules/Follow_AccountModule");
+const Bookmark = require("../modules/BookmarkModule");
+const message = require("../common/Message");
 
 /**
  * Lấy tất cả các bài viết NHÁP của bản thân
  * @query       page
  * @permission  Đăng nhập
- * @return      200: Thành công, trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/drafts", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -40,7 +41,7 @@ router.get("/drafts", Auth.authenGTUser, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: "Lấy danh sách bài viết nháp thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -53,7 +54,7 @@ router.get("/drafts", Auth.authenGTUser, async (req, res, next) => {
  * Lấy tất cả các bài viết PUBLIC của bản thân
  * @query       page
  * @permission  Đăng nhập
- * @return      200: Thành công, trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/public", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -79,7 +80,7 @@ router.get("/public", Auth.authenGTUser, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: "Lấy danh sách bài viết nháp thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -92,7 +93,7 @@ router.get("/public", Auth.authenGTUser, async (req, res, next) => {
  * Lấy tất cả các bài viết UNLISTED của bản thân
  * @query       page
  * @permission  Đăng nhập mới được thực hiện
- * @return      200: Thành công, trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/unlisted", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -117,7 +118,7 @@ router.get("/unlisted", Auth.authenGTUser, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: "Lấy danh sách bài viết nháp thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -130,7 +131,7 @@ router.get("/unlisted", Auth.authenGTUser, async (req, res, next) => {
  * Lấy tất cả các bài viết bản thân đã bookmark
  * @query       page
  * @permission  Đăng nhập mới được thực hiện
- * @return      200: Thành công, trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/bookmark", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -155,7 +156,7 @@ router.get("/bookmark", Auth.authenGTUser, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: "Lấy danh sách bài viết bookmark thành công",
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -168,7 +169,7 @@ router.get("/bookmark", Auth.authenGTUser, async (req, res, next) => {
  * Lấy các bài viết công khai, chưa kiểm duyệt
  * @query       page
  * @permission  Moder trở lên (xem để kiểm duyệt)
- * @return      200: Thành công. trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/browse", Auth.authenGTModer, async (req, res, next) => {
   try {
@@ -195,7 +196,7 @@ router.get("/browse", Auth.authenGTModer, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết thành công thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -208,7 +209,7 @@ router.get("/browse", Auth.authenGTModer, async (req, res, next) => {
  * Lấy các bài viết spam
  * @query       page
  * @permission  Moder trở lên
- * @return      200: Thành công. trả về danh sách bài viết
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/spam", Auth.authenGTModer, async (req, res, next) => {
   try {
@@ -235,7 +236,7 @@ router.get("/spam", Auth.authenGTModer, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết spam thành công thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -248,14 +249,15 @@ router.get("/spam", Auth.authenGTModer, async (req, res, next) => {
  * Tìm kiếm bài viết theo từ khóa
  * @query       k, page
  * @permisson   Theo token
- * @return      200: Thành công, trả về các bài viết
+ * @return      200: GET_SUCCESSFULL
+ *              400: NOT_KEYWORD_SEARCH
  */
 router.get("/search", async (req, res, next) => {
   try {
     let { k } = req.query;
     if (!k || k.trim().length == 0) {
       return res.status(400).json({
-        message: "Chưa có từ khóa tìm kiếm",
+        message: message.post.NOT_KEYWORD_SEARCH,
       });
     }
 
@@ -300,7 +302,7 @@ router.get("/search", async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết tìm kiếm thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -313,7 +315,7 @@ router.get("/search", async (req, res, next) => {
  * Lấy các bài viết public mới nhất
  * @query       page
  * @permisson   Theo token
- * @return      200: Thành công, trả về các bài viết thuộc trang
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/newest", async (req, res, next) => {
   try {
@@ -356,7 +358,7 @@ router.get("/newest", async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -369,7 +371,7 @@ router.get("/newest", async (req, res, next) => {
  * Lấy các bài viết theo thứ tự rating cao -> thấp
  * @query       page
  * @permisson   theo token
- * @return      200: Thành công, trả về các bài viết thuộc trang
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/trending", async (req, res, next) => {
   try {
@@ -411,7 +413,7 @@ router.get("/trending", async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -424,7 +426,7 @@ router.get("/trending", async (req, res, next) => {
  * Lấy các bài viết thuộc tag follow và tài khoản follow mới nhất
  * @query       page
  * @permisson   Đăng nhập mới được thực thi
- * @return      200: Thành công, trả về các bài viết thuộc trang
+ * @return      200: GET_SUCCESSFULL
  */
 router.get("/following", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -451,7 +453,7 @@ router.get("/following", Auth.authenGTUser, async (req, res, next) => {
     }
 
     res.status(200).json({
-      message: `Lấy danh sách bài viết thành công`,
+      message: message.common.GET_SUCCESSFULL,
       data: data,
     });
   } catch (error) {
@@ -464,9 +466,9 @@ router.get("/following", Auth.authenGTUser, async (req, res, next) => {
  * Lấy 1 bài viết theo id (đồng thời tính 1 lượt view)
  * @params      id bài viết
  * @permission  Theo token
- * @return      200: Thành công, trả về bài viết + các tags của bài viết
- *              403: Không có quyền xem bài viết
- *              404: Không tìm thấy bài viết
+ * @return      200: GET_SUCCESSFULL
+ *              403: ERROR_ACCOUNT_UNAUTHORIZATION
+ *              404: POST_NOT_EXISTED
  */
 router.get("/:id", async (req, res, next) => {
   try {
@@ -508,7 +510,7 @@ router.get("/:id", async (req, res, next) => {
           post.view++;
 
           res.status(200).json({
-            message: "Lấy bài viết thành công",
+            message: message.common.GET_SUCCESSFULL,
             data: {
               post: post,
               author: author,
@@ -517,7 +519,7 @@ router.get("/:id", async (req, res, next) => {
           });
         } else {
           return res.status(403).json({
-            message: "Bạn không có quyền truy cập",
+            message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
           });
         }
       } else {
@@ -528,7 +530,7 @@ router.get("/:id", async (req, res, next) => {
           // Không tính view
 
           return res.status(200).json({
-            message: "Lấy bài viết thành công",
+            message: message.common.GET_SUCCESSFULL,
             data: {
               post: post,
               author: author,
@@ -542,7 +544,7 @@ router.get("/:id", async (req, res, next) => {
           post.view++;
 
           return res.status(200).json({
-            message: "Lấy bài viết thành công",
+            message: message.common.GET_SUCCESSFULL,
             data: {
               post: post,
               author: author,
@@ -551,13 +553,13 @@ router.get("/:id", async (req, res, next) => {
           });
         } else {
           return res.status(403).json({
-            message: "Bạn không có quyền truy cập",
+            message: message.account.ERROR_ACCOUNT_UNAUTHORIZATION,
           });
         }
       }
     } else {
       res.status(404).json({
-        message: "Bài viết không tồn tại",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -571,10 +573,10 @@ router.get("/:id", async (req, res, next) => {
  * @body        title, content, tags, access
  * @permisson   Chỉ User trở lên mới được thi thi
  *              Tài khoản bị khóa không thể tạo bài viết
- * @return      201: Tạo bài viết thành công, trả về bài viết vừa tạo
- *              400: Thiếu dữ liệu
- *              403: Tài khoản bị khóa, không thể tạo bài viết
- *              404: Thẻ thuộc bài viết không hợp lệ
+ * @return      201: ACTION_SUCCESSFULL
+ *              400: ERROR_TAG_NUMBER/ERROR_DATA
+ *              403: ERROR_ACCOUNT_BANNED
+ *              404: TAG_INVALID
  */
 router.post("/", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -584,7 +586,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
     // Tài khoản bị khóa
     if (acc.account_status != 0) {
       return res.status(403).json({
-        message: "Tài khoản đã bị khóa, không thể viết bài",
+        message: message.account.ERROR_ACCOUNT_BANNED,
       });
     }
 
@@ -594,7 +596,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
 
       if (tags.length < 1 || tags.length > 5) {
         return res.status(400).json({
-          message: "Số lượng thẻ chỉ từ 1 đến 5",
+          message: message.post.ERROR_TAG_NUMBER,
         });
       }
 
@@ -603,7 +605,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
         let tagExists = await Tag.has(id_tag);
         if (!tagExists) {
           return res.status(404).json({
-            message: "Thẻ không hợp lệ",
+            message: message.tag.TAG_INVALID,
           });
         }
       }
@@ -619,7 +621,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       }
 
       res.status(201).json({
-        message: "Tạo bài viết thành công",
+        message: message.common.ACTION_SUCCESSFULL,
         data: {
           post: postResult,
           tags: tags,
@@ -627,7 +629,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       });
     } else {
       res.status(400).json({
-        message: "Thiếu dữ liệu",
+        message: message.common.ERROR_DATA,
       });
     }
   } catch (error) {
@@ -642,10 +644,10 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
  * @body        title, content, access, tags
  * @permission  Chỉ người viết bài mới được sửa
  *              Tài khoản bị khóa không thẻ sửa bài
- * @return      200: Cập nhật thành công
- *              400: Thiếu dữ liệu
- *              403: Không thể sửa bài viết của người khác
- *              404: Bài viết hoặc thẻ thuộc bài viết không hợp lệ
+ * @return      200: UPDATE_SUCCESSFULL
+ *              400: ERROR_TAG_NUMBER/ERROR_DATA
+ *              403: ERROR_ACCOUNT_BANNED/NOT_UPDATE
+ *              404: TAG_INVALID/POST_NOT_EXISTED
  */
 router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -656,7 +658,7 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
     // Tài khoản bị khóa
     if (acc.account_status != 0) {
       return res.status(403).json({
-        message: "Tài khoản đã bị khóa, không thể sửa bài",
+        message: message.account.ERROR_ACCOUNT_BANNED,
       });
     }
 
@@ -672,7 +674,7 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
 
           if (tags.length < 1 || tags.length > 5) {
             return res.status(400).json({
-              message: "Số lượng thẻ chỉ từ 1 đến 5",
+              message: message.post.ERROR_TAG_NUMBER,
             });
           }
 
@@ -681,7 +683,7 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
             let tagExists = await Tag.has(id_tag);
             if (!tagExists) {
               return res.status(404).json({
-                message: "Thẻ không hợp lệ",
+                message: message.tag.TAG_INVALID,
               });
             }
           }
@@ -700,21 +702,21 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
           let result = await Post.update(id_post, req.body);
 
           res.status(200).json({
-            message: "Cập nhật bài viết thành công",
+            message: message.common.UPDATE_SUCCESSFULL,
           });
         } else {
           res.status(400).json({
-            message: "Thiếu dữ liệu",
+            message: message.common.ERROR_DATA,
           });
         }
       } else {
         res.status(403).json({
-          message: "Không thể sửa bài viết của người khác",
+          message: message.post.NOT_UPDATE,
         });
       }
     } else {
       res.status(404).json({
-        message: "Không tìm thấy bài viết để sửa",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -728,9 +730,10 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
  * @params      id bài viết
  * @permission  Chỉ người viết mới được xóa bài
  *              Tài khoản bị khóa không thể xóa bài
- * @return      200: Xóa thành công
- *              401: Không thể xóa bài viết của người khác
- *              404: Không tìm thấy bài viết để xóa
+ * @return      200: ACTION_SUCCESSFULL
+ *              401: NOT_DELETE
+ *              403: ERROR_ACCOUNT_BANNED
+ *              404: POST_NOT_EXISTED
  */
 router.delete("/:id", Auth.authenGTUser, async (req, res, next) => {
   try {
@@ -740,7 +743,7 @@ router.delete("/:id", Auth.authenGTUser, async (req, res, next) => {
     // Tài khoản bị khóa
     if (acc.account_status != 0) {
       return res.status(403).json({
-        message: "Tài khoản đã bị khóa, không thể xóa bài",
+        message: message.account.ERROR_ACCOUNT_BANNED,
       });
     }
 
@@ -751,16 +754,16 @@ router.delete("/:id", Auth.authenGTUser, async (req, res, next) => {
       if (checkAuthor || acc.id_role == 0) {
         await Post.deletePost(id);
         res.status(200).json({
-          message: "Xóa bài viết thành công",
+          message: message.common.ACTION_SUCCESSFULL,
         });
       } else {
         res.status(401).json({
-          message: "Không thể xóa bài viết của người khác",
+          message: message.post.NOT_DELETE,
         });
       }
     } else {
       res.status(404).json({
-        message: "Không tìm thấy bài viết để xóa",
+        message: message.post.POST_NOT_EXISTED,
       });
     }
   } catch (error) {
@@ -776,9 +779,9 @@ router.delete("/:id", Auth.authenGTUser, async (req, res, next) => {
  *      2: Spam
  * @params      id, status_new
  * @permission  Chỉ Moder trở lên
- * @return      200: Thành công
- *              400: Trạng thái mới không hợp lệ
- *              404: Không tìm thấy bài viết để update
+ * @return      200: UPDATE_SUCCESSFULL
+ *              400: STATUS_INVALID
+ *              404: POST_NOT_EXISTED
  */
 router.put(
   "/:id/status/:status_new",
@@ -790,7 +793,7 @@ router.put(
       // Kiểm tra giá trị trạng thái
       if (status_new < 0 || status_new > 2) {
         return res.status(400).json({
-          message: "Trạng thái mới không hợp lệ",
+          message: message.post.STATUS_INVALID,
         });
       }
 
@@ -800,7 +803,7 @@ router.put(
       if (postExists) {
         let result = await Post.changeStatus(id, status_new);
         let isPublic = await Post.isPublic(id);
-
+        y;
         if (status_new == 1 && isPublic) {
           let poster = await Post.selectId(id);
           let author = await Account.selectId(poster.id_account);
@@ -818,11 +821,11 @@ router.put(
         }
 
         res.status(200).json({
-          message: "Cập nhật trạng thái bài viết thành công",
+          message: message.common.UPDATE_SUCCESSFULL,
         });
       } else {
         res.status(404).json({
-          message: "Không tìm thấy bài viết này",
+          message: message.post.POST_NOT_EXISTED,
         });
       }
     } catch (error) {
