@@ -620,4 +620,17 @@ db.getPostsSpam = (page = 0) => {
   }
 };
 
+db.hasTitle = (title) => {
+  return new Promise((resolve, reject) => {
+    pool.query(
+      "SELECT * FROM post WHERE title = $1",
+      [title],
+      (err, result) => {
+        if (err) return reject(err);
+        return resolve(result.rowCount > 0);
+      }
+    );
+  });
+};
+
 module.exports = db;

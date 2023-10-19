@@ -15,9 +15,9 @@ module.exports = {
     CODE_TIMED: "Mã đã hết hạn",
     ERROR_CODE: "Mã không đúng",
     CHANGE_PASSWORD_SUCCESSFULL: "Thay đổi mật khẩu thành công",
-    NEW_PASSWORD_VALIDATION: "Mật khẩu mới không được bỏ trống",
+    NEW_PASSWORD_VALIDATION: "Mật khẩu mới không được bỏ trống!",
     OLD_PASSWORD_WRONG: "Mật khẩu cũ không chính xác!",
-    OLD_PASSWORD_VALIDATION: "Thiếu mật khẩu cũ!",
+    OLD_PASSWORD_VALIDATION: "Vui lòng nhập mật khẩu cũ!",
     ERROR_ACCOUNT_EXISTED: "Tên đăng nhập đã được sử dụng!",
     ERROR_EMAIL_EXISTED: "Email này đã được sử dụng!",
     REGISTER_SUCCESSFULL: "Tạo mới tài khoản thành công",
@@ -37,7 +37,8 @@ module.exports = {
     ERROR_PASSWORD_MIN: "Mật khẩu tối thiểu 8 ký tự",
     ERROR_PASSWORD_MAX: "Mật khẩu tối đa 32 ký tự",
     ERROR_PASSWORD_FORMAT:
-      "Mật khẩu phải có một ký tự hoa, một ký tự thường và một ký tự đặc biệt",
+      "Mật khẩu phải có một ký tự hoa, một ký tự thường và một ký tự đặc biệt!",
+    NOT_OVERLAP: "Mật khẩu cũ và mật khẩu mới không được phép trùng nhau!",
   },
   bookmark: {
     BOOKMARKED: "Bạn đã đánh dấu bài viết này rồi",
@@ -83,10 +84,14 @@ module.exports = {
   post: {
     POST_NOT_EXISTED: "Bài viết không tồn tại",
     NOT_KEYWORD_SEARCH: "Chưa có từ khóa tìm kiếm",
-    ERROR_TAG_NUMBER: "Số lượng thẻ được gắn cho bài viết tối đa là 5",
+    ERROR_TAG_NUMBER:
+      "Số lượng thẻ được gắn cho bài viết tối thiểu là 1 và tối đa là 5",
     NOT_UPDATE: "Không thể sửa bài viết của người khác",
     NOT_DELETE: "Không thể xóa bài viết của người khác",
     STATUS_INVALID: "Trạng thái mới không hợp lệ",
+    ERROR_TITLE: "Tiêu đề không được để trống hoặc chuỗi rỗng!",
+    ERROR_CONTENT: "Nội dung không được để trống hoặc chuỗi rỗng!",
+    ERROR_TITLE_EXISTED: "Tiêu đề bài viết đã tồn tại",
   },
   tag: {
     TAG_NOT_EXISTED: "Thẻ không tồn tại",

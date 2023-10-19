@@ -168,7 +168,7 @@ router.get("/bookmark", Auth.authenGTUser, async (req, res, next) => {
 /**
  * Lấy các bài viết công khai, chưa kiểm duyệt
  * @query       page
- * @permission  Moder trở lên (xem để kiểm duyệt)
+ * @permission  moder, admin
  * @return      200: GET_SUCCESSFULL
  */
 router.get("/browse", Auth.authenGTModer, async (req, res, next) => {
@@ -208,7 +208,7 @@ router.get("/browse", Auth.authenGTModer, async (req, res, next) => {
 /**
  * Lấy các bài viết spam
  * @query       page
- * @permission  Moder trở lên
+ * @permission  moder,admin
  * @return      200: GET_SUCCESSFULL
  */
 router.get("/spam", Auth.authenGTModer, async (req, res, next) => {
@@ -590,6 +590,18 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       });
     }
 
+    if (!title || title.trim() === "") {
+      return res.status(400).json({
+        message: message.post.ERROR_TITLE,
+      });
+    }
+
+    if (!content || content.trim() === "") {
+      return res.status(400).json({
+        message: message.post.ERROR_CONTENT,
+      });
+    }
+
     if (title && content && tags) {
       // Loại bỏ các thẻ trùng lặp (nếu có)
       tags = [...new Set(tags)];
@@ -611,6 +623,12 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       }
 
       // Thêm bài viết
+      let titleExists = await Post.hasTitle(title);
+      if (titleExists) {
+        return res.status(401).json({
+          message: message.post.ERROR_TITLE_EXISTED,
+        });
+      }
       let postResult = await Post.addPost(acc.id_account, req.body);
 
       let idPostInsert = postResult.id_post;
@@ -629,7 +647,7 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       });
     } else {
       res.status(400).json({
-        message: message.common.ERROR_DATA,
+        message: message.post.ERROR_CONTENT,
       });
     }
   } catch (error) {

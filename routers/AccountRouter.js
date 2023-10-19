@@ -308,6 +308,7 @@ router.post("/:id/confirm", async (req, res, next) => {
  *              403: OLD_PASSWORD_WRONG
  */
 router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/;
   try {
     let new_password = req.body.new_password;
     let old_password = req.body.old_password;
@@ -319,7 +320,13 @@ router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
       let match = await bcrypt.compare(old_password, acc.password);
 
       if (match) {
-        if (new_password !== "") {
+        if (old_password === new_password) {
+          return res.status(401).json({
+            message: message.account.NOT_OVERLAP,
+          });
+        }
+
+        if (!passwordRegex.test(new_password)) {
           bcrypt.hash(new_password, saltRounds, async (err, hash) => {
             new_password = hash;
             let changePassword = await Account.updatePassword(
@@ -333,7 +340,7 @@ router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
           });
         } else {
           return res.status(400).json({
-            message: message.account.NEW_PASSWORD_VALIDATION,
+            message: message.account.ERROR_PASSWORD_FORMAT,
           });
         }
       } else {
