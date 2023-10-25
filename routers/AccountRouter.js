@@ -308,7 +308,6 @@ router.post("/:id/confirm", async (req, res, next) => {
  *              403: OLD_PASSWORD_WRONG
  */
 router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/;
   try {
     let new_password = req.body.new_password;
     let old_password = req.body.old_password;
@@ -326,21 +325,37 @@ router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
           });
         }
 
-        if (!passwordRegex.test(new_password)) {
-          bcrypt.hash(new_password, saltRounds, async (err, hash) => {
-            new_password = hash;
-            let changePassword = await Account.updatePassword(
-              id_account,
-              new_password
-            );
-
-            return res.status(200).json({
-              message: message.account.CHANGE_PASSWORD_SUCCESSFULL,
+        if (new_password !== "") {
+          if (new_password.length < 8) {
+            return res.status(400).json({
+              message: message.account.ERROR_PASSWORD_MIN,
             });
-          });
+          }
+          if (new_password.length > 32) {
+            return res.status(400).json({
+              message: message.account.ERROR_PASSWORD_MAX,
+            });
+          }
+          const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\W)/;
+          if (passwordRegex.test(new_password)) {
+            bcrypt.hash(new_password, saltRounds, async (err, hash) => {
+              new_password = hash;
+              let changePassword = await Account.updatePassword(
+                id_account,
+                new_password
+              );
+              return res.status(200).json({
+                message: message.common.UPDATE_SUCCESSFULL,
+              });
+            });
+          } else {
+            return res.status(400).json({
+              message: message.account.ERROR_PASSWORD_FORMAT,
+            });
+          }
         } else {
           return res.status(400).json({
-            message: message.account.ERROR_PASSWORD_FORMAT,
+            message: message.account.NEW_PASSWORD_VALIDATION,
           });
         }
       } else {
@@ -350,7 +365,7 @@ router.put("/change/password", Auth.authenGTUser, async (req, res, next) => {
       }
     } else {
       return res.status(401).json({
-        message: message.account.OLD_PASSWORD_VALIDATION,
+        message: message.account.OLD_PASSWORD_WRONG,
       });
     }
   } catch (err) {
@@ -1230,7 +1245,7 @@ router.put(
  * Thay đổi thông tin tài khoản, chỉ có thể đổi của chính bản thân
  * @body        real_name, birth, gender, company, phone, avatar
  * @permission  Đăng nhập
- * @return      400: VALIDATION_REQUIRED
+ * @return      400: REAL_NAME_VALIDATION
  *              200: UPDATE_SUCCESSFULL
  */
 router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
@@ -1239,7 +1254,7 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
 
     if (!req.body.real_name) {
       res.status(400).json({
-        message: message.account.VALIDATION_REQUIRED,
+        message: message.account.REAL_NAME_VALIDATION,
       });
     }
 
@@ -1252,7 +1267,9 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
       gender: req.body.gender ?? 0,
       company: req.body.company ?? "",
       phone: req.body.phone ?? "",
-      avatar: req.body.avatar ?? "",
+      avatar:
+        req.body.avatar ??
+        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg",
     };
 
     let result = await Account.update(id_account, account);
@@ -1284,7 +1301,7 @@ router.put("/update/information", Auth.authenGTUser, async (req, res, next) => {
 
     if (!req.body.real_name) {
       res.status(400).json({
-        message: message.account.VALIDATION_REQUIRED,
+        message: message.account.REAL_NAME_VALIDATION,
       });
     }
 

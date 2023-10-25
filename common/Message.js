@@ -27,7 +27,6 @@ module.exports = {
     NOT_KEYWORD_SEARCH: "Chưa có từ khóa tìm kiếm",
     UPDATE_SUCCESSFULL: "Cập nhật thành công",
     UPDATE_FAILED: "Cập nhật thất bại",
-    VALIDATION_REQUIRED: "Yêu cầu bắt buộc",
     UNLOCK_SUCCESSFULL: "Mở khóa tài khoản thành công",
     LOCK_SUCCESSFULL: "Khóa vĩnh viễn tài khoản thành công",
     ERROR_ACCOUNT_NAME_VALIDATION: "Tên đăng nhập không được quá 50 ký tự",
@@ -39,6 +38,7 @@ module.exports = {
     ERROR_PASSWORD_FORMAT:
       "Mật khẩu phải có một ký tự hoa, một ký tự thường và một ký tự đặc biệt!",
     NOT_OVERLAP: "Mật khẩu cũ và mật khẩu mới không được phép trùng nhau!",
+    REAL_NAME_VALIDATION: "Tên hiển thị không được để trống!",
   },
   bookmark: {
     BOOKMARKED: "Bạn đã đánh dấu bài viết này rồi",

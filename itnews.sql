@@ -28,7 +28,7 @@ CREATE TABLE account(
 	real_name varchar(50) NOT NULL,
 	email varchar(50),
 	password text NOT NULL,
-	avatar text NOT NULL default '/public/avatar.png',
+	avatar text NOT NULL default 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg',
 	birth date,
 	gender smallint default 0,
 	-- gender:
