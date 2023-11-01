@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "API",
   "engines": {
-    "node": "14.17.5"
+    "node": "18.x"
   },
   "main": "app.js",
   "scripts": {
