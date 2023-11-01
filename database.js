@@ -2,10 +2,10 @@ const { Pool } = require("pg");
 
 const pool = new Pool({
   host: "localhost",
-  database: "itnews",
+  port: 5432,
   user: "postgres",
   password: "123",
-  port: 5432,
+  database: "itnews",
 });
 
 pool.on("error", (err) => {
