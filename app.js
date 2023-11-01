@@ -11,7 +11,7 @@ const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
 
 app.use(fileUpload());
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use("/api/v2/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 dotenv.config();
 
@@ -95,5 +95,8 @@ app.use(`${apiUrl2}/information`, require("./routers/InformationRouter"));
 
 //feedback
 app.use(`${apiUrl2}/feedback`, require("./routers/FeedbackRouter"));
+app.use("/", (req, res, next) => {
+  res.json({ message: "ONE" });
+});
 
 module.exports = app;

@@ -63,6 +63,8 @@ module.exports = {
     DELETE_FEEDBACK_SUCCESSFULL: "Xóa phản hồi thành công",
     ADD_FEEDBACK_SUCCESSFULL: "Thêm phản hồi thành công",
     BOOKMARK_FEEDBACK: "Đánh dấu đã đọc phản hồi thành công!",
+    ERROR_SUBJECT: "Tiêu đề không được để trống hoặc chuỗi rỗng!",
+    ERROR_CONTENT: "Nội dung không được để trống hoặc chuỗi rỗng!",
   },
   follow_account: {
     NOT_FOLLOW: "Không thể tự theo dõi bản thân",

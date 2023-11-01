@@ -25,6 +25,7 @@
     "pg": "^8.7.1",
     "postgres-pool": "^5.0.5",
     "stream": "^0.0.2",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^4.3.0"
   },
   "devDependencies": {
