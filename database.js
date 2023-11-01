@@ -1,15 +1,11 @@
 const { Pool } = require("pg");
 
-// const pool = new Pool({
-//   host: "localhost",
-//   database: "itnews",
-//   user: "postgres",
-//   password: "123",
-//   port: 5432,
-// });
-
 const pool = new Pool({
-  connectionString: process.env.POSTGRES_URL + "?sslmode=require",
+  host: "localhost",
+  database: "itnews",
+  user: "postgres",
+  password: "123",
+  port: 5432,
 });
 
 pool.on("error", (err) => {
