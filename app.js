@@ -89,8 +89,5 @@ app.use(`${apiUrl2}/information`, require("./routers/InformationRouter"));
 
 //feedback
 app.use(`${apiUrl2}/feedback`, require("./routers/FeedbackRouter"));
-app.use("/", (req, res, next) => {
-  res.json({ message: "ONE" });
-});
 
 module.exports = app;

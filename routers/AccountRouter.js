@@ -264,10 +264,6 @@ router.post("/:id/confirm", async (req, res, next) => {
           id_account,
           new_password
         );
-
-        // return res.status(201).json({
-        //     message: 'Thay đổi mật khẩu thành công',
-        // })
       });
 
       let acc = await Account.selectId(id_account);
@@ -487,6 +483,31 @@ router.post("/", async (req, res, next) => {
  *              200: Cập nhật thành công, trả về tài khoản vừa cập nhật
  */
 // TODO: Deprecated
+
+function validateDateOfBirth(dateString) {
+  const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+  if (!dateRegex.test(dateString)) {
+    return "Ngày sinh không đúng định dạng (VD: dd-mm-yyyy)";
+  }
+
+  const [day, month, year] = dateString.split("-");
+
+  const dob = new Date(`${year}-${month}-${day}`);
+
+  const today = new Date();
+  const age = today.getFullYear() - dob.getFullYear();
+
+  if (age < 15) {
+    return "Ngày sinh không phù hợp (tuổi dưới 15)";
+  }
+
+  if (age > 70) {
+    return "Ngày sinh không hợp lệ (tuổi trên 70)";
+  }
+
+  return null;
+}
+
 router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
   try {
     let updateId = req.params.id;
@@ -504,22 +525,15 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
       });
     }
 
-    let birth = null;
+    const dateValidationResult = validateDateOfBirth(req.body.birth);
 
-    if (req.body.birth === null || req.body.birth === "") {
-      birth = null;
-    } else {
-      let date = checkDate(req.body.birth);
-      if (date === false) {
-        return res.status(400).json({
-          message: "Ngày sinh không hợp lệ",
-        });
-      } else {
-        birth = date;
-      }
+    if (dateValidationResult) {
+      return res.status(400).json({
+        message: dateValidationResult,
+      });
     }
 
-    var account = {
+    let account = {
       real_name: req.body.real_name ?? "",
       birth: birth,
       gender: req.body.gender ?? 0,
@@ -541,38 +555,6 @@ router.put("/:id", Auth.authenGTUser, async (req, res, next) => {
     });
   }
 });
-
-function checkDate(date) {
-  let arr = date.split("/");
-
-  let day = parseInt(arr[0]);
-  let month = parseInt(arr[1]);
-  let year = parseInt(arr[2]);
-
-  if (checkMonth(month) && day > 0 && day <= lastDayOfMonth(day, month, year)) {
-    return month + "/" + day + "/" + year;
-  }
-  return false;
-}
-
-function lastDayOfMonth(day, month, year) {
-  if (month == 2) {
-    if (isLeapYear(year)) return 29;
-    return 28;
-  } else if (month == 4 || month == 6 || month == 9 || month == 11) {
-    return 30;
-  }
-  return 31;
-}
-
-function checkMonth(month) {
-  return month > 0 && month <= 12;
-}
-
-function isLeapYear(year) {
-  if (year % 400 == 0 || (year % 4 == 0 && year % 100 != 0)) return true;
-  return false;
-}
 
 /**
  * Lấy thông tin của tài khoản
@@ -600,6 +582,7 @@ router.get("/avatar", Auth.authenGTUser, async (req, res, next) => {
   try {
     let id_account = Auth.tokenData(req).id_account;
     let path = await Account.selectAvatar(id_account);
+    console.log(path);
     let image = fs.readFile(path, (err, data) => {
       if (err) {
         return res.sendStatus(500);

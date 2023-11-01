@@ -20,7 +20,7 @@
       "description": "API for Tag"
     }
   ],
-  "schemes": ["HTTP"],
+  "schemes": ["http", "https"],
   "consumes": ["application/json"],
   "produces": ["application/json"],
   "securityDefinitions": {
@@ -37,13 +37,13 @@
       "get": {
         "tags": ["ACCOUNT"],
         "summary": "Lấy thông tin chi tiết của tài khoản người dùng",
-        "description": "",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Lấy thông tin tài khoản thành công"
           },
-          "404": {
-            "description": "Không tìm thấy tài khoản"
+          "401": {
+            "description": "Đề nghị yêu cầu xác thực"
           },
           "500": {
             "description": "Lỗi thực thi request trên server"
