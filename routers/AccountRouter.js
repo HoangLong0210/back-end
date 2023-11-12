@@ -1241,6 +1241,12 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
       });
     }
 
+    if (req.body.real_name.length > 50) {
+      return res.status(402).json({
+        message: message.account.ERROR_REAL_NAME_VALIDATION,
+      });
+    }
+
     let birth = null;
     if (req.body.birth !== "") birth = req.body.birth;
 
@@ -1248,7 +1254,7 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
       real_name: req.body.real_name ?? "",
       birth: birth,
       gender: req.body.gender ?? 0,
-      company: req.body.company ?? "",
+      email: req.body.email ?? "",
       phone: req.body.phone ?? "",
       avatar:
         req.body.avatar ??
@@ -1279,13 +1285,19 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
  */
 router.put("/update/information", Auth.authenGTUser, async (req, res, next) => {
   try {
-    let { real_name, birth, company, gender, phone } = req.body;
+    let { real_name, birth, email, gender, phone } = req.body;
     let id_account = Auth.tokenData(req).id_account;
     let acc = await Account.selectId(id_account);
 
     if (!real_name || real_name.trim() === "") {
       return res.status(401).json({
         message: message.account.REAL_NAME_VALIDATION,
+      });
+    }
+
+    if (req.body.real_name.length > 50) {
+      return res.status(402).json({
+        message: message.account.ERROR_REAL_NAME_VALIDATION,
       });
     }
 
@@ -1369,6 +1381,7 @@ router.put("/update/information", Auth.authenGTUser, async (req, res, next) => {
       real_name: real_name,
       birth: birth,
       gender: gender ?? 0,
+      email: email,
       phone: phone,
       avatar:
         avatar ??

@@ -29,12 +29,12 @@ module.exports = {
     UPDATE_FAILED: "Cập nhật thất bại",
     UNLOCK_SUCCESSFULL: "Mở khóa tài khoản thành công",
     LOCK_SUCCESSFULL: "Khóa vĩnh viễn tài khoản thành công",
-    ERROR_ACCOUNT_NAME_VALIDATION: "Tên đăng nhập không được quá 50 ký tự",
-    ERROR_REAL_NAME_VALIDATION: "Tên hiển thị không được quá 50 ký tự",
-    ERROR_EMAIL_VALIDATION: "Email không được quá 50 ký tự",
-    ERROR_EMAIL_INVALID_FORMAT: "Email không đúng định dạng",
-    ERROR_PASSWORD_MIN: "Mật khẩu tối thiểu 8 ký tự",
-    ERROR_PASSWORD_MAX: "Mật khẩu tối đa 32 ký tự",
+    ERROR_ACCOUNT_NAME_VALIDATION: "Tên đăng nhập không được quá 50 ký tự!",
+    ERROR_REAL_NAME_VALIDATION: "Tên hiển thị không được quá 50 ký tự!",
+    ERROR_EMAIL_VALIDATION: "Email không được quá 50 ký tự!",
+    ERROR_EMAIL_INVALID_FORMAT: "Email không đúng định dạng!",
+    ERROR_PASSWORD_MIN: "Mật khẩu tối thiểu 8 ký tự!",
+    ERROR_PASSWORD_MAX: "Mật khẩu tối đa 32 ký tự!",
     ERROR_PASSWORD_FORMAT:
       "Mật khẩu phải có một ký tự hoa, một ký tự thường và một ký tự đặc biệt!",
     NOT_OVERLAP: "Mật khẩu cũ và mật khẩu mới không được phép trùng nhau!",
@@ -43,7 +43,7 @@ module.exports = {
     BIRTH_FORMAT: "Ngày sinh không đúng định dạng!",
     BIRTH_NOT_VALID:
       "Ngày sinh không phù hợp (ngày sinh nhỏ nhất 15 và lớn nhất là 75 tuổi)",
-    PHONE_VALIDATION: "Số điện thoại không được để trống",
+    PHONE_VALIDATION: "Số điện thoại không được để trống!",
     PHONE_NOT_VALID: "Số điện thoại không hợp lệ!",
   },
   bookmark: {
@@ -100,6 +100,7 @@ module.exports = {
     ERROR_TITLE: "Tiêu đề không được để trống hoặc chuỗi rỗng!",
     ERROR_CONTENT: "Nội dung không được để trống hoặc chuỗi rỗng!",
     ERROR_TITLE_EXISTED: "Tiêu đề bài viết đã tồn tại",
+    TITLE_VALIDATION: "Tiêu đề không được quá 100 ký tự!",
   },
   tag: {
     TAG_NOT_EXISTED: "Thẻ không tồn tại",

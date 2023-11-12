@@ -319,12 +319,12 @@ db.add = (account) => {
 db.update = (id, account) => {
   return new Promise((resolve, reject) => {
     pool.query(
-      "UPDATE account SET real_name=$1, birth=$2, gender=$3, company=$4, phone=$5, avatar=$6 WHERE id_account=$7 RETURNING *",
+      "UPDATE account SET real_name=$1, birth=$2, gender=$3, email=$4, phone=$5, avatar=$6 WHERE id_account=$7 RETURNING *",
       [
         account.real_name,
         account.birth,
         account.gender,
-        account.company,
+        account.email,
         account.phone,
         account.avatar,
         id,

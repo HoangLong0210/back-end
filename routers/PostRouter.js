@@ -596,6 +596,12 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
       });
     }
 
+    if (title.length > 100) {
+      return res.status(400).json({
+        message: message.post.TITLE_VALIDATION,
+      });
+    }
+
     if (!content || content.trim() === "") {
       return res.status(400).json({
         message: message.post.ERROR_CONTENT,

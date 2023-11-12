@@ -147,17 +147,17 @@ router.post("/", Auth.authenGTUser, async (req, res, next) => {
     let id_account = Auth.tokenData(req).id_account;
     let subject = req.body.subject;
     let content = req.body.content;
+    if (!subject || subject.trim() === "") {
+      return res.status(400).json({
+        message: message.feedback.ERROR_SUBJECT,
+      });
+    }
+    if (!content || content.trim() === "") {
+      return res.status(400).json({
+        message: message.feedback.ERROR_CONTENT,
+      });
+    }
     if (subject && content) {
-      if (subject.trim() === "") {
-        return res.status(400).json({
-          message: message.feedback.ERROR_SUBJECT,
-        });
-      }
-      if (content.trim() === "") {
-        return res.status(400).json({
-          message: message.feedback.ERROR_CONTENT,
-        });
-      }
       let add = await Feedback.add(id_account, subject, content);
       return res.status(201).json({
         message: message.feedback.ADD_FEEDBACK_SUCCESSFULL,
