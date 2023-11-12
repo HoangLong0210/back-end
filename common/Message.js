@@ -38,7 +38,13 @@ module.exports = {
     ERROR_PASSWORD_FORMAT:
       "Mật khẩu phải có một ký tự hoa, một ký tự thường và một ký tự đặc biệt!",
     NOT_OVERLAP: "Mật khẩu cũ và mật khẩu mới không được phép trùng nhau!",
-    REAL_NAME_VALIDATION: "Tên hiển thị không được để trống!",
+    REAL_NAME_VALIDATION: "Tên hiển thị không được để trống hoặc chuỗi rỗng!",
+    BIRTH_VALIDATION: "Ngày sinh không được để trống!",
+    BIRTH_FORMAT: "Ngày sinh không đúng định dạng!",
+    BIRTH_NOT_VALID:
+      "Ngày sinh không phù hợp (ngày sinh nhỏ nhất 15 và lớn nhất là 75 tuổi)",
+    PHONE_VALIDATION: "Số điện thoại không được để trống",
+    PHONE_NOT_VALID: "Số điện thoại không hợp lệ!",
   },
   bookmark: {
     BOOKMARKED: "Bạn đã đánh dấu bài viết này rồi",

@@ -1279,17 +1279,72 @@ router.put("/change/information", Auth.authenGTUser, async (req, res, next) => {
  */
 router.put("/update/information", Auth.authenGTUser, async (req, res, next) => {
   try {
+    let { real_name, birth, company, gender, phone } = req.body;
     let id_account = Auth.tokenData(req).id_account;
     let acc = await Account.selectId(id_account);
 
-    if (!req.body.real_name) {
-      res.status(400).json({
+    if (!real_name || real_name.trim() === "") {
+      return res.status(401).json({
         message: message.account.REAL_NAME_VALIDATION,
       });
     }
 
-    let birth = null;
-    if (req.body.birth !== "") birth = req.body.birth;
+    if (!birth) {
+      return res.status(401).json({
+        message: message.account.BIRTH_VALIDATION,
+      });
+    }
+
+    const dateRegex = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+    if (!dateRegex.test(birth)) {
+      return res.status(401).json({
+        message: message.account.BIRTH_FORMAT,
+      });
+    }
+
+    const birthDate = new Date(birth);
+    const today = new Date();
+    const age =
+      today.getFullYear() -
+      birthDate.getFullYear() -
+      (today.getMonth() < birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() < birthDate.getDate())
+        ? 1
+        : 0);
+
+    if (age > 75 || age < 15) {
+      return res.status(401).json({
+        message: message.account.BIRTH_NOT_VALID,
+      });
+    }
+
+    if (!phone || phone.trim() === "") {
+      return res.status(401).json({
+        message: message.account.PHONE_VALIDATION,
+      });
+    }
+
+    regex = /((09|03|07|08|05)+([0-9]{8})\b)/g;
+    if (!regex.test(phone)) {
+      return res.status(401).json({
+        message: message.account.PHONE_NOT_VALID,
+      });
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (email.length > 50) {
+      return res.status(402).json({
+        message: message.account.ERROR_EMAIL_VALIDATION,
+      });
+    }
+
+    if (!emailRegex.test(email)) {
+      return res.status(403).json({
+        message: message.account.ERROR_EMAIL_INVALID_FORMAT,
+      });
+    }
 
     let avatar = "";
 
@@ -1310,13 +1365,14 @@ router.put("/update/information", Auth.authenGTUser, async (req, res, next) => {
       }
     }
 
-    var account = {
-      real_name: req.body.real_name ?? acc.real_name,
+    let account = {
+      real_name: real_name,
       birth: birth,
-      gender: req.body.gender ?? acc.gender,
-      company: req.body.company ?? acc.company,
-      phone: req.body.phone ?? acc.phone,
-      avatar: avatar,
+      gender: gender ?? 0,
+      phone: phone,
+      avatar:
+        avatar ??
+        "https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg",
     };
 
     let result = await Account.update(id_account, account);
